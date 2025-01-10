@@ -20,16 +20,9 @@ cursor = db.cursor()
 # 創建資料庫
 cursor.execute("CREATE DATABASE IF NOT EXISTS reddit;")
 
-#cursor.execute("SHOW DATABASES;")
-#records = cursor.fetchall()
-#for r in records:
-#   print(r)
+PROGRESS_FILE = "fetch_progress.txt" # 進度文件
 
-PROGRESS_FILE = "fetch_progress.txt"
-
-
-
-
+# 讀取進度文件
 def load_last_progress():
     if os.path.exists(PROGRESS_FILE):
         print(f"進度文件 '{PROGRESS_FILE}' 存在，嘗試讀取...")
@@ -40,7 +33,7 @@ def load_last_progress():
                 # 確保進度文件有兩行
                 if len(lines) < 2:
                     print("進度文件格式錯誤，將從頭開始抓取。")
-                    return None, 0  # 返回 None 和 0，表示從頭開始
+                    return None, 0  # 表示從頭開始
 
                 # 讀取並檢查 first line（last_submission）和 second line（total_comments_fetched）
                 after = lines[0].strip() if lines[0].strip() else None
@@ -60,8 +53,7 @@ def load_last_progress():
         print(f"進度文件 '{PROGRESS_FILE}' 不存在，從頭開始抓取。")
         return None, 0  # 如果進度文件不存在，返回預設值
 
-
-
+# 存取進度文件
 def save_progress(last_submission_full_name, total_comments_fetched):
     try:
         with open(PROGRESS_FILE, "w") as f:
@@ -70,32 +62,23 @@ def save_progress(last_submission_full_name, total_comments_fetched):
     except Exception as e:
         print(f"保存進度時發生錯誤: {e}")
 
-
-# 設置時間範圍
-#start_date = datetime(2019, 7, 10, tzinfo=timezone.utc)  # 開始日期，美職首次嘗試。格式化
-#end_date = datetime(2024, 12, 31, tzinfo=timezone.utc)    # 結束日期，美職宣布於明年春訓測試後的三周。格式化
-
 cursor.execute("USE reddit;")
 
+# 創建表格
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS reddit_table (
-        comment_id VARCHAR(255),
-        post_title VARCHAR(1024),
-        subreddit VARCHAR(255),
-        author VARCHAR(255),
-        body TEXT,
-        created_utc DATETIME,
-        score INT,
-        UNIQUE (comment_id)  -- 這裡為 comment_id 設置唯一索引
+        comment_id VARCHAR(255), # 留言的識別碼
+        post_title VARCHAR(1024), # 貼文標題
+        subreddit VARCHAR(255), # 討論版名稱
+        author VARCHAR(255), # 作者
+        body TEXT, # 留言的內容
+        created_utc DATETIME, # 創建時間
+        score INT, # 分數 (類似於讚數)
+        UNIQUE (comment_id)  # comment_id設置為唯一索引
     );
 """)
 
-comments_data = []
-
-# Reddit:
-# client_id: sQWu6dHo5V_BQ7crFXROKw 
-# secret    zPDUvfBfuHIqn94rPWKPaXO02RYzeg
-# developers    Pitiful_Box_6265
+# Reddit API的連接設置 
 reddit = praw.Reddit(
     client_id = 'sQWu6dHo5V_BQ7crFXROKw',
     client_secret = 'zPDUvfBfuHIqn94rPWKPaXO02RYzeg',
@@ -103,58 +86,63 @@ reddit = praw.Reddit(
     user_agent = 'my_reddit_app/1.0_Pitiful_Box_6265'
 )
 
-# 關鍵字搜尋並考量語言及重複內容
+# 欲搜尋的所有關鍵字
 keywords = ["automated ball-strike", "automated strike zone", "Electronic strike zone", "Automated pitch call",
             "Automatic Ball-Strike", "strike zone automation", "robotic strike zone", "AI strike zone", "automatic strike zone",
             "automated ball strike", "Automatic Ball Strike", "electronic ball strike", "electronic ball-strike", "robotic ball strike",
             "automatic ball/strike", "Automatic ball/strike", "electronic ball/strike", "robotic ball/strike", "robotic ball-strike"]
 
-
-# 將關鍵字列表轉換為正則表達式，確保關鍵字周圍是邊界（確保精確匹配）
+# 將關鍵字列表轉換為正規表達式，以確保完整匹配任何一個關鍵字
 regex = r"\b(" + "|".join(map(re.escape, keywords)) + r")\b"
 
-# 定義一個函數來抓取指定討論版的資料
+# 抓取Reddit任一討論版的數據
 def fetch_comments(subreddit, keywords, regex):
-    comments_data = []
-    last_submission_full_name, total_comments_fetched = load_last_progress()
+    comments_data = [] # 儲存數據
+    last_submission_full_name, total_comments_fetched = load_last_progress() # 讀取進度
+
+    # 根據關鍵字於指定討論版搜尋所有相關貼文
     for submission in subreddit.search(" OR ".join(keywords), time_filter='all', limit=None, params={"after": last_submission_full_name}):
         try:
-            post_title = submission.title
-            created_time = datetime.fromtimestamp(submission.created_utc, tz=timezone.utc)
-            #if start_date <= created_time <= end_date:
-            if re.search(regex, post_title, re.IGNORECASE):
-                # 處理貼文內容（selftext）作為一條留言
+            post_title = submission.title # 貼文標題
+            created_time = datetime.fromtimestamp(submission.created_utc, tz=timezone.utc) # 貼文的創建時間
+
+            #  檢查貼文標題是否完整匹配關鍵字(不分大小寫)
+            if re.search(regex, post_title, re.IGNORECASE): 
                 post_data = (
-                    submission.id,  # submission.id 作為唯一識別符
+                    submission.id,  # submission.id為唯一索引
                     post_title,
                     submission.subreddit.display_name,
-                    submission.author.name if submission.author else 'deleted',
-                    submission.selftext,  # 使用 selftext 作為貼文內容
+                    submission.author.name if submission.author else 'deleted', # 處理作者(帳號)刪除的情況
+                    submission.selftext,  # 貼文內容
                     created_time.strftime('%Y-%m-%d %H:%M:%S'),
                     submission.score
                 )
+                # 將貼文所有數據視為一筆資料
                 comments_data.append(post_data)
                 total_comments_fetched += 1         
             
-                submission.comments.replace_more(limit=None)  # 確保抓取所有留言
-                comments = submission.comments.list()  # 扁平化所有留言為一個列表
-                
+                submission.comments.replace_more(limit=None)  # 抓取所有留言
+                comments = submission.comments.list()  # 將根留言和所有回覆合併為單一列表，利於處理所有的留言
+
+                # 處理每一筆留言
                 for comment in comments:
-                    if isinstance(comment, praw.models.Comment):
+                    if isinstance(comment, praw.models.Comment): # 檢查是否為Reddit留言
                         comment_data = (
                             comment.id,
                             post_title,
-                            submission.subreddit.display_name,  # 抓取子版名稱
-                            comment.author.name if comment.author else 'deleted',  # 防止作者被刪除
+                            submission.subreddit.display_name,  # 討論版名稱
+                            comment.author.name if comment.author else 'deleted',
                             comment.body,
                             created_time.strftime('%Y-%m-%d %H:%M:%S'),
                             comment.score
                         )
+                        # 儲存數據
                         comments_data.append(comment_data)
                         total_comments_fetched += 1
-                            
+
+                        # 爬取留言的每一筆回覆
                         if comment.replies:
-                            for reply in comment.replies.list():  # 扁平化回覆
+                            for reply in comment.replies.list():  # 利於處理所有回復
                                 if isinstance(reply, praw.models.Comment):
                                     comment_data_reply = (
                                         reply.id,
@@ -168,13 +156,13 @@ def fetch_comments(subreddit, keywords, regex):
                                     comments_data.append(comment_data_reply)
                                     total_comments_fetched += 1
                             print(f"已抓取留言來自貼文: '{submission.title}'")
-           
             print(f"目前已抓取留言總數: {total_comments_fetched}")
             
-            # 更新 last_submission_full_name 為當前抓取的最後一篇 submission 的 full_name
+            # 更新last_submission_full_name為當前抓取的最後一篇submission的full_name
             last_submission_full_name = submission.fullname
             print(f"最後抓取的提交 full_name: {last_submission_full_name}")
-                     
+
+            # 儲存進度
             save_progress(last_submission_full_name, total_comments_fetched)
                      
              # 根據 Reddit API 返回的剩餘請求數量動態調整延遲時間
@@ -186,7 +174,7 @@ def fetch_comments(subreddit, keywords, regex):
             else:
                 sleep_time = 2  # 如果剩餘請求數量足夠，則保持較短的延遲
             time.sleep(sleep_time)  # 根據情況調整延遲時間
-            
+       # 錯誤處理     
         except ClientException as e:
             print(f"Reddit API error: {e}")
             time.sleep(120)
@@ -197,9 +185,9 @@ def fetch_comments(subreddit, keywords, regex):
             print(f"Unexpected error: {e}")
     return comments_data
 
-# 抓取三個子版資料
+# 抓取指定討論版的資料
 comments_data = []
-comments_data += fetch_comments(reddit.subreddit("all"), keywords, regex)
+comments_data += fetch_comments(reddit.subreddit("all"), keywords, regex) # 爬取所有討論版的資料
 #comments_data += fetch_comments(reddit.subreddit("baseball"), keywords, regex)
 #comments_data += fetch_comments(reddit.subreddit("mlb"), keywords, regex)
 
@@ -212,7 +200,7 @@ for i in range(0, len(comments_data), batch_size):
         cursor.executemany("""
             INSERT INTO reddit_table (comment_id, post_title, subreddit, author, body, created_utc, score)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE 
+            ON DUPLICATE KEY UPDATE # 根據表格欄位comment_id檢查並避免重複爬取重複的資料
             post_title = VALUES(post_title),
             subreddit = VALUES(subreddit),
             author = VALUES(author),
@@ -223,10 +211,10 @@ for i in range(0, len(comments_data), batch_size):
         db.commit()
         total_inserted += len(batch)  # 更新總插入筆數
         print(f"Inserted {len(batch)} comments into the database.")
+   # 錯誤處理
     except mysql.connector.Error as err:
         print(f"Error inserting batch: {err}")
         db.rollback()
-
 # 最後輸出總共插入的筆數
 print(f"Total inserted comments: {total_inserted}")
 
