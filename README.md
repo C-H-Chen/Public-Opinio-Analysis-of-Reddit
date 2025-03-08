@@ -14,8 +14,17 @@
 
  ``` 
  ├── core
- │   ├── main.py    <-   
+ │   ├── main.py               <-   
  ├── data  
  │   ├── processed_data.csv    <-  
- │   ├── raw_data.csv      <-  
+ │   ├── raw_data.csv          <-
+ ├── docs  
+ │   ├── architecture.jpg      <-
+ │   ├── requirements.txt      <-
+ ├── sql & scraping
+ │   ├── sql_scraping.py       <-  
+ ├── sql & scraping
+ │   ├── README.md             <-
+ │   ├── tableau.twbx          <-  
+ ├── README.md                 <-  
  ``` 
