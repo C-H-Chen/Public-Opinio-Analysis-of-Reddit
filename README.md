@@ -2,7 +2,7 @@
 
 本專案是一個基於Python的網路論壇之輿論分析專案。針對"電子好球帶"議題，於Reddit爬蟲符合所有關鍵字的全部內容並匯入SQL資料庫，接著進行一連串的特徵工程與參數調整，再運行機器學習模型與情感分析技術，獲得輿情趨勢的相關結果，最後透過Tableau展示輿情變化。  
 
-下圖為專案架構，或請見[/docs/architecture.jpg](https://github.com/C-H-Chen/-Reddit---/blob/main/docs/architecture.jpg)。  
+下圖為專案架構，或請見[/docs/architecture.jpg](https://github.com/C-H-Chen/-Reddit---/blob/main/docs/Architecture.jpg)。  
 
  ![architecture](https://github.com/user-attachments/assets/98915b62-1938-4639-b14f-233bc8e9bd5b)
 
@@ -21,7 +21,7 @@
  │   ├── raw_data.csv          <- 原始資料
  │
  ├── docs  
- │   ├── architecture.jpg      <- 專案架構圖
+ │   ├── Architecture.jpg      <- 專案架構圖
  │   ├── requirements.txt      <- 所需套件清單
  │
  ├── sql & scraping
