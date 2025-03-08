@@ -10,26 +10,26 @@
 
 建議於python3.8+中執行，所需要安裝的套件請見[/docs/requirements.txt](https://github.com/C-H-Chen/-Reddit---/blob/main/docs/requirements.txt)。
 
-# 目錄架構說明:  
+# 目錄結構說明:  
 
  ``` 
  ├── core
- │   ├── main.py               <-
+ │   ├── main.py               <- 核心程式碼(特徵工程、資料匯入、情感分析與模型訓練)
  │ 
  ├── data  
- │   ├── processed_data.csv    <-  
- │   ├── raw_data.csv          <-
+ │   ├── processed_data.csv    <- 特徵工程後且含情感分數的資料
+ │   ├── raw_data.csv          <- 原始資料
  │
  ├── docs  
- │   ├── architecture.jpg      <-
- │   ├── requirements.txt      <-
+ │   ├── architecture.jpg      <- 專案架構圖
+ │   ├── requirements.txt      <- 所需套件清單
  │
  ├── sql & scraping
- │   ├── sql_scraping.py       <-
+ │   ├── sql_scraping.py       <- 爬蟲程式碼(Reddit爬蟲、sql資料表建立與資料插入)
  │
- ├── sql & scraping
- │   ├── README.md             <-
- │   ├── tableau.twbx          <-
+ ├── tableau
+ │   ├── README.md             <- tableau線上連結
+ │   ├── tableau.twbx          <- tableau檔案
  │
- ├── README.md                 <-  
+ ├── README.md                 <-  專案說明文檔
  ``` 
