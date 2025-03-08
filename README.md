@@ -4,7 +4,7 @@
 
 下圖為專案架構，或請見[/docs/architecture.jpg](https://github.com/C-H-Chen/-Reddit---/blob/main/docs/architecture.jpg)。  
 
-![architecture](https://github.com/user-attachments/assets/67228327-dce2-4d0b-9787-049e252f656a)  
+ ![architecture](https://github.com/user-attachments/assets/98915b62-1938-4639-b14f-233bc8e9bd5b)
 
 # 環境:  
 
