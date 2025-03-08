@@ -13,7 +13,7 @@
 # 目錄架構說明:  
 
  ├── core  
-&thinsp;│&emsp;&ensp;&nbsp;├── main.py&emsp;&emsp;&emsp;&emsp;&emsp;<-  
+│&emsp;&ensp;&nbsp;├── main.py&emsp;&emsp;&emsp;&emsp;&emsp;<-  
  ├── data  
-&thinsp;│&emsp;&ensp;&nbsp;├── processed_data.csv&emsp;&emsp;&emsp;&emsp;&emsp;<-  
+│&emsp;&ensp;&nbsp;├── processed_data.csv&emsp;&emsp;&emsp;&emsp;&emsp;<-  
  │&emsp;&ensp;&nbsp;├── raw_data.csv&emsp;&emsp;&emsp;&emsp;&emsp;<-  
