@@ -1,1 +1,10 @@
-
+praw==7.8.1
+mysql-connector-python==9.0.0
+pandas==2.0.3
+nltk==3.9.1
+matplotlib==3.7.5
+seaborn==0.13.2
+sqlalchemy==2.0.38
+vaderSentiment==3.3.2
+bertopic==0.16.4
+kaleido==0.2.1
