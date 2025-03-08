@@ -13,4 +13,4 @@
 # 目錄架構說明:  
 
  ├── data  
- │&ensp├── external       <- Data from third party sources.  
+ │&ensp;├── external       <- Data from third party sources.  
