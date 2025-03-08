@@ -66,7 +66,7 @@ cursor.execute("USE reddit;")
 
 # 創建表格
 cursor.execute("""
-    CREATE TABLE IF NOT EXISTS reddit_table (
+    CREATE TABLE IF NOT EXISTS raw_data (
         comment_id VARCHAR(255), # 留言的識別碼
         post_title VARCHAR(1024), # 貼文標題
         subreddit VARCHAR(255), # 討論版名稱
@@ -198,7 +198,7 @@ for i in range(0, len(comments_data), batch_size):
     batch = comments_data[i:i+batch_size]
     try:
         cursor.executemany("""
-            INSERT INTO reddit_table (comment_id, post_title, subreddit, author, body, created_utc, score)
+            INSERT INTO raw_data (comment_id, post_title, subreddit, author, body, created_utc, score)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE # 根據表格欄位comment_id檢查並避免重複爬取重複的資料
             post_title = VALUES(post_title),
