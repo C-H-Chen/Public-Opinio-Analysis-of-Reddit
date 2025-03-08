@@ -27,7 +27,7 @@ database='reddit'
 engine = create_engine(f'mysql+mysqlconnector://{username}:{password}@{host}/{database}')
 
 # 使用Pandas將所有資料查詢結果讀取到 DataFrame
-query = "SELECT * FROM `reddit_table`"
+query = "SELECT * FROM `raw_data`"
 df = pd.read_sql(query, engine)
 
 # 資料處理 :
@@ -48,7 +48,7 @@ def stop_words(text):
 def sentiment_analysis(text):
     return analyzer.polarity_scores(text)
 
-# 原始資料1236筆
+# 原始資料1272筆
 df['Clean_Body'] = df['body'].apply(stop_words) # 清理貼文標題和正文
 
 # 將Clean_Body中只包含"delet"或空格的資料設為缺失值
@@ -129,7 +129,7 @@ topic_sentiment = topic_sentiment[topic_sentiment['Topic'] != -1] # 確保過濾
 print(topic_sentiment) # 顯示每個主題的情感分數
 
 # 保存處理完的輸出結果至MySQL
-df_cleaned.to_sql('reddit_topic_sentiment_analysis', con=engine, if_exists='replace', index=False)
+df_cleaned.to_sql('processed_data', con=engine, if_exists='replace', index=False)
 
 fig = topic_model.visualize_barchart(n_words=10, width=600, height=600) # 生成主題的長條圖
 
