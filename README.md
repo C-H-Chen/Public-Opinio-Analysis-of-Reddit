@@ -4,8 +4,9 @@
 
 下圖為專案架構，或請見[/docs/architecture.jpg](https://github.com/C-H-Chen/Public-Opinio-Analysis-of-Reddit/blob/main/docs/architecture.jpg)。  
 
-![architecture](https://github.com/user-attachments/assets/5224d011-3078-4701-96be-eecf685a7a81)
+![architecture](https://github.com/user-attachments/assets/5224d011-3078-4701-96be-eecf685a7a81)  
 
+點擊[此處](https://public.tableau.com/views/Reddit-/sheet4?:language=zh-TW&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)可線上查看tableau展示的輿情變化。  
 
 # 環境:  
 
